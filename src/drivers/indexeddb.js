@@ -1,11 +1,11 @@
-import isIndexedDBValid from '../utils/isIndexedDBValid';
 import createBlob from '../utils/createBlob';
-import idb from '../utils/idb';
-import Promise from '../utils/promise';
 import executeCallback from '../utils/executeCallback';
 import executeTwoCallbacks from '../utils/executeTwoCallbacks';
-import normalizeKey from '../utils/normalizeKey';
 import getCallback from '../utils/getCallback';
+import idb from '../utils/idb';
+import isIndexedDBValid from '../utils/isIndexedDBValid';
+import normalizeKey from '../utils/normalizeKey';
+import Promise from '../utils/promise';
 
 // Some code originally from async_storage.js in
 // [Gaia](https://github.com/mozilla-b2g/gaia).
@@ -542,6 +542,80 @@ function getItem(key, callback) {
             })
             .catch(reject);
     });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
+function getAllItems(callback) {
+    var self = this;
+
+    var promise = self.ready().then(() => Promise.resolve([]));
+    /*var promise = new Promise(function(resolve, reject) {
+        self
+            .ready()
+            .then(function() {
+                createTransaction(self._dbInfo, READ_ONLY, function(
+                    err,
+                    transaction
+                ) {
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    try {
+                        var store = transaction.objectStore(
+                            self._dbInfo.storeName
+                        );
+
+                        if ('getAllRecords' in store) {
+                            var reqA = store.getAllRecords();
+
+                            reqA.onsuccess = function() {
+                                var values = reqA.result;
+                                for (var i = 0; i < values.length; i++) {
+                                    var value = values[i];
+                                    if (_isEncodedBlob(value)) {
+                                        values[i] = _decodeBlob(value);
+                                    }
+                                }
+                                resolve(values);
+                            };
+
+                            reqA.onerror = function() {
+                                reject(reqA.error);
+                            };
+                        } else {
+                            var reqB = store.openCursor();
+                            var records = [];
+
+                            reqB.onsuccess = function() {
+                                var cursor = reqB.result;
+
+                                if (!cursor) {
+                                    resolve(records);
+                                    return;
+                                }
+
+                                var value = cursor.value;
+                                if (_isEncodedBlob(value)) {
+                                    value = _decodeBlob(value);
+                                }
+                                records.push(value);
+                                cursor.continue();
+                            };
+
+                            reqB.onerror = function() {
+                                reject(reqB.error);
+                            };
+                        }
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+            })
+            .catch(reject);
+    });*/
 
     executeCallback(promise, callback);
     return promise;
@@ -1105,6 +1179,7 @@ var asyncStorage = {
     _support: isIndexedDBValid(),
     iterate: iterate,
     getItem: getItem,
+    getAllItems: getAllItems,
     setItem: setItem,
     removeItem: removeItem,
     clear: clear,

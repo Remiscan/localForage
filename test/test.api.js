@@ -11,6 +11,7 @@ var SUPPORTED_DRIVERS = DRIVERS.filter(function(driverName) {
 
 var driverApiMethods = [
     'getItem',
+    'getAllItems',
     'setItem',
     'clear',
     'length',
@@ -139,6 +140,7 @@ describe('localForage', function() {
                 },
                 iterate: driverDummyMethod,
                 getItem: driverDummyMethod,
+                getAllItems: driverDummyMethod,
                 setItem: driverDummyMethod,
                 removeItem: driverDummyMethod,
                 clear: driverDummyMethod,
@@ -242,6 +244,7 @@ SUPPORTED_DRIVERS.forEach(function(driverName) {
             expect(localforage.supports).to.be.a('function');
             expect(localforage.iterate).to.be.a('function');
             expect(localforage.getItem).to.be.a('function');
+            expect(localforage.getAllItems).to.be.a('function');
             expect(localforage.setItem).to.be.a('function');
             expect(localforage.clear).to.be.a('function');
             expect(localforage.length).to.be.a('function');
@@ -369,6 +372,22 @@ SUPPORTED_DRIVERS.forEach(function(driverName) {
                         localforage.getItem('key2'),
                         localforage.getItem('key3')
                     ]).then(
+                        function(values) {
+                            expect(values).to.eql([
+                                'value1',
+                                'value2',
+                                'value3'
+                            ]);
+                            done();
+                        },
+                        function(error) {
+                            done(error || 'error');
+                        }
+                    );
+                });
+
+                it('retrieves all items from the storage', function(done) {
+                    localforage.getAllItems().then(
                         function(values) {
                             expect(values).to.eql([
                                 'value1',

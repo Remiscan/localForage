@@ -97,6 +97,39 @@
         return promise;
     }
 
+    function getAllItems(callback) {
+        var self = this;
+
+        var promise = new Promise(function(resolve, reject) {
+            self
+                .ready()
+                .then(function() {
+                    try {
+                        var db = self._dbInfo.db;
+                        var items = [];
+
+                        for (var key in db) {
+                            var result = db[key];
+
+                            if (result) {
+                                result = _deserialize(result);
+                            }
+
+                            items.push(result);
+                        }
+
+                        resolve(items);
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+                .catch(reject);
+        });
+
+        executeCallback(promise, callback);
+        return promise;
+    }
+
     function iterate(callback) {
         var self = this;
 
@@ -444,6 +477,7 @@
         // _supports: function() { return true; }
         iterate: iterate,
         getItem: getItem,
+        getAllItems: getAllItems,
         setItem: setItem,
         removeItem: removeItem,
         clear: clear,

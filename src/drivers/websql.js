@@ -1,9 +1,9 @@
-import isWebSQLValid from '../utils/isWebSQLValid';
-import serializer from '../utils/serializer';
-import Promise from '../utils/promise';
 import executeCallback from '../utils/executeCallback';
-import normalizeKey from '../utils/normalizeKey';
 import getCallback from '../utils/getCallback';
+import isWebSQLValid from '../utils/isWebSQLValid';
+import normalizeKey from '../utils/normalizeKey';
+import Promise from '../utils/promise';
+import serializer from '../utils/serializer';
 
 /*
  * Includes code from:
@@ -157,6 +157,50 @@ function getItem(key, callback) {
             })
             .catch(reject);
     });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
+function getAllItems(callback) {
+    var self = this;
+
+    /*var promise = new Promise(function(resolve, reject) {
+        self
+            .ready()
+            .then(function() {
+                resolve([]);
+                var dbInfo = self._dbInfo;
+                dbInfo.db.transaction(function(t) {
+                    tryExecuteSql(
+                        t,
+                        dbInfo,
+                        `SELECT * FROM ${
+                            dbInfo.storeName
+                        }`,
+                        [],
+                        function(t, results) {
+                            var items = [];
+                            for (var i = 0; i < results.rows.length; i++) {
+                                var item = results.rows.item(i).value;
+
+                                if (item) {
+                                    item = dbInfo.serializer.deserialize(item);
+                                    items.push(item);
+                                }
+                            }
+
+                            resolve(items);
+                        },
+                        function(t, error) {
+                            reject(error);
+                        }
+                    );
+                });
+            })
+            .catch(reject);
+    });*/
+    var promise = self.ready().then(() => Promise.resolve([]));
 
     executeCallback(promise, callback);
     return promise;
@@ -598,6 +642,7 @@ var webSQLStorage = {
     _support: isWebSQLValid(),
     iterate: iterate,
     getItem: getItem,
+    getAllItems: getAllItems,
     setItem: setItem,
     removeItem: removeItem,
     clear: clear,

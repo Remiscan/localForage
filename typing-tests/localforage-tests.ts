@@ -110,6 +110,15 @@ namespace LocalForageTest {
         let newStr: string = str;
     });
 
+    localForage.getAllItems((err: any, strs: string[]) => {
+        let newError: any = err;
+        let newStr: string = strs.join(', ');
+    });
+
+    localForage.getAllItems<string>().then((strs: string[]) => {
+        let newStr: string = strs.join(', ');
+    });
+
     localForage.setItem("key", "value",(err: any, str: string) => {
         let newError: any = err;
         let newStr: string = str
@@ -130,6 +139,7 @@ namespace LocalForageTest {
         _driver: "CustomDriver",
         _initStorage: (options: LocalForageOptions) => {},
         getItem: <T>(key: string, callback?: (err: any, value: T) => void) => Promise.resolve({} as T),
+        getAllItems: <T>(callback?: (err: any, values: T[]) => void) => Promise.resolve([] as T[]),
         setItem: <T>(key: string, value: T, callback?: (err: any, value: T) => void) => Promise.resolve(value),
         removeItem: (key: string, callback?: (err: any) => void) => Promise.resolve(),
         clear: (callback?: (err: any) => void) => Promise.resolve(),
@@ -145,6 +155,7 @@ namespace LocalForageTest {
         _initStorage: (options: LocalForageOptions) => {},
         _support: true,
         getItem: <T>(key: string, callback?: (err: any, value: T) => void) => Promise.resolve({} as T),
+        getAllItems: <T>(callback?: (err: any, values: T[]) => void) => Promise.resolve([] as T[]),
         setItem: <T>(key: string, value: T, callback?: (err: any, value: T) => void) => Promise.resolve(value),
         removeItem: (key: string, callback?: (err: any) => void) => Promise.resolve(),
         clear: (callback?: (err: any) => void) => Promise.resolve(),
@@ -160,6 +171,7 @@ namespace LocalForageTest {
         _initStorage: (options: LocalForageOptions) => {},
         _support: () => Promise.resolve(true),
         getItem: <T>(key: string, callback?: (err: any, value: T) => void) => Promise.resolve({} as T),
+        getAllItems: <T>(callback?: (err: any, values: T[]) => void) => Promise.resolve([] as T[]),
         setItem: <T>(key: string, value: T, callback?: (err: any, value: T) => void) => Promise.resolve(value),
         removeItem: (key: string, callback?: (err: any) => void) => Promise.resolve(),
         clear: (callback?: (err: any) => void) => Promise.resolve(),

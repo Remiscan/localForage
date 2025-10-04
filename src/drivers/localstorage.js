@@ -3,12 +3,12 @@
 // side-effects (all data will be serialized on save and only data that
 // can be converted to a string via `JSON.stringify()` will be saved).
 
-import isLocalStorageValid from '../utils/isLocalStorageValid';
-import serializer from '../utils/serializer';
-import Promise from '../utils/promise';
 import executeCallback from '../utils/executeCallback';
-import normalizeKey from '../utils/normalizeKey';
 import getCallback from '../utils/getCallback';
+import isLocalStorageValid from '../utils/isLocalStorageValid';
+import normalizeKey from '../utils/normalizeKey';
+import Promise from '../utils/promise';
+import serializer from '../utils/serializer';
 
 function _getKeyPrefix(options, defaultConfig) {
     var keyPrefix = options.name + '/';
@@ -104,6 +104,35 @@ function getItem(key, callback) {
         }
 
         return result;
+    });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
+function getAllItems(callback) {
+    var self = this;
+    /*var promise = self.ready().then(function() {
+        var dbInfo = self._dbInfo;
+        var length = localStorage.length;
+        var items = [];
+
+        for (var i = 0; i < length; i++) {
+            var itemKey = localStorage.key(i);
+            if (itemKey.indexOf(dbInfo.keyPrefix) === 0) {
+                var item = localStorage.getItem(itemKey);
+                if (item) {
+                    item = dbInfo.serializer.deserialize(item);
+                    items.push(item);
+                }
+            }
+        }
+
+        return items;
+    });*/
+    var promise = self.ready().then(() => {
+        console.log('yahaha');
+        return Promise.resolve([]);
     });
 
     executeCallback(promise, callback);
@@ -320,6 +349,7 @@ var localStorageWrapper = {
     _support: isLocalStorageValid(),
     iterate: iterate,
     getItem: getItem,
+    getAllItems: getAllItems,
     setItem: setItem,
     removeItem: removeItem,
     clear: clear,
