@@ -165,7 +165,7 @@ function getItem(key, callback) {
 function getAllItems(callback) {
     var self = this;
 
-    /*var promise = new Promise(function(resolve, reject) {
+    var promise = new Promise(function(resolve, reject) {
         self
             .ready()
             .then(function() {
@@ -175,9 +175,7 @@ function getAllItems(callback) {
                     tryExecuteSql(
                         t,
                         dbInfo,
-                        `SELECT * FROM ${
-                            dbInfo.storeName
-                        }`,
+                        `SELECT * FROM ${dbInfo.storeName}`,
                         [],
                         function(t, results) {
                             var items = [];
@@ -199,8 +197,7 @@ function getAllItems(callback) {
                 });
             })
             .catch(reject);
-    });*/
-    var promise = self.ready().then(() => Promise.resolve([]));
+    });
 
     executeCallback(promise, callback);
     return promise;

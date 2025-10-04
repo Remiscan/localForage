@@ -112,7 +112,7 @@ function getItem(key, callback) {
 
 function getAllItems(callback) {
     var self = this;
-    /*var promise = self.ready().then(function() {
+    var promise = self.ready().then(function() {
         var dbInfo = self._dbInfo;
         var length = localStorage.length;
         var items = [];
@@ -129,10 +129,6 @@ function getAllItems(callback) {
         }
 
         return items;
-    });*/
-    var promise = self.ready().then(() => {
-        console.log('yahaha');
-        return Promise.resolve([]);
     });
 
     executeCallback(promise, callback);

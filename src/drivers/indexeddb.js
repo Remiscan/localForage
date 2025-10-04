@@ -550,8 +550,7 @@ function getItem(key, callback) {
 function getAllItems(callback) {
     var self = this;
 
-    var promise = self.ready().then(() => Promise.resolve([]));
-    /*var promise = new Promise(function(resolve, reject) {
+    var promise = new Promise(function(resolve, reject) {
         self
             .ready()
             .then(function() {
@@ -568,8 +567,8 @@ function getAllItems(callback) {
                             self._dbInfo.storeName
                         );
 
-                        if ('getAllRecords' in store) {
-                            var reqA = store.getAllRecords();
+                        if ('getAll' in store) {
+                            var reqA = store.getAll();
 
                             reqA.onsuccess = function() {
                                 var values = reqA.result;
@@ -615,7 +614,7 @@ function getAllItems(callback) {
                 });
             })
             .catch(reject);
-    });*/
+    });
 
     executeCallback(promise, callback);
     return promise;

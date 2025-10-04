@@ -391,6 +391,7 @@ SUPPORTED_DRIVERS.forEach(function(driverName) {
                         function(values) {
                             expect(values).to.eql([
                                 'value1',
+                                'value1',
                                 'value2',
                                 'value3'
                             ]);

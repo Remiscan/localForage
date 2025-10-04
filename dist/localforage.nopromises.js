@@ -629,66 +629,63 @@ function getItem(key, callback) {
 function getAllItems(callback) {
     var self = this;
 
-    var promise = self.ready().then(function () {
-        return Promise$1.resolve([]);
-    });
-    /*var promise = new Promise(function(resolve, reject) {
-        self
-            .ready()
-            .then(function() {
-                createTransaction(self._dbInfo, READ_ONLY, function(
-                    err,
-                    transaction
-                ) {
-                    if (err) {
-                        return reject(err);
-                    }
-                     try {
-                        var store = transaction.objectStore(
-                            self._dbInfo.storeName
-                        );
-                         if ('getAllRecords' in store) {
-                            var reqA = store.getAllRecords();
-                             reqA.onsuccess = function() {
-                                var values = reqA.result;
-                                for (var i = 0; i < values.length; i++) {
-                                    var value = values[i];
-                                    if (_isEncodedBlob(value)) {
-                                        values[i] = _decodeBlob(value);
-                                    }
-                                }
-                                resolve(values);
-                            };
-                             reqA.onerror = function() {
-                                reject(reqA.error);
-                            };
-                        } else {
-                            var reqB = store.openCursor();
-                            var records = [];
-                             reqB.onsuccess = function() {
-                                var cursor = reqB.result;
-                                 if (!cursor) {
-                                    resolve(records);
-                                    return;
-                                }
-                                 var value = cursor.value;
+    var promise = new Promise$1(function (resolve, reject) {
+        self.ready().then(function () {
+            createTransaction(self._dbInfo, READ_ONLY, function (err, transaction) {
+                if (err) {
+                    return reject(err);
+                }
+
+                try {
+                    var store = transaction.objectStore(self._dbInfo.storeName);
+
+                    if ('getAll' in store) {
+                        var reqA = store.getAll();
+
+                        reqA.onsuccess = function () {
+                            var values = reqA.result;
+                            for (var i = 0; i < values.length; i++) {
+                                var value = values[i];
                                 if (_isEncodedBlob(value)) {
-                                    value = _decodeBlob(value);
+                                    values[i] = _decodeBlob(value);
                                 }
-                                records.push(value);
-                                cursor.continue();
-                            };
-                             reqB.onerror = function() {
-                                reject(reqB.error);
-                            };
-                        }
-                    } catch (e) {
-                        reject(e);
+                            }
+                            resolve(values);
+                        };
+
+                        reqA.onerror = function () {
+                            reject(reqA.error);
+                        };
+                    } else {
+                        var reqB = store.openCursor();
+                        var records = [];
+
+                        reqB.onsuccess = function () {
+                            var cursor = reqB.result;
+
+                            if (!cursor) {
+                                resolve(records);
+                                return;
+                            }
+
+                            var value = cursor.value;
+                            if (_isEncodedBlob(value)) {
+                                value = _decodeBlob(value);
+                            }
+                            records.push(value);
+                            cursor["continue"]();
+                        };
+
+                        reqB.onerror = function () {
+                            reject(reqB.error);
+                        };
                     }
-                });
-            })
-            .catch(reject);
-    });*/
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        })["catch"](reject);
+    });
 
     executeCallback(promise, callback);
     return promise;
@@ -1515,11 +1512,12 @@ function getItem$1(key, callback) {
 
 function getAllItems$1(callback) {
     var self = this;
-    /*var promise = self.ready().then(function() {
+    var promise = self.ready().then(function () {
         var dbInfo = self._dbInfo;
         var length = localStorage.length;
         var items = [];
-         for (var i = 0; i < length; i++) {
+
+        for (var i = 0; i < length; i++) {
             var itemKey = localStorage.key(i);
             if (itemKey.indexOf(dbInfo.keyPrefix) === 0) {
                 var item = localStorage.getItem(itemKey);
@@ -1529,10 +1527,8 @@ function getAllItems$1(callback) {
                 }
             }
         }
-         return items;
-    });*/
-    var promise = self.ready().then(function () {
-        console.log('yahaha');return Promise$1.resolve([]);
+
+        return items;
     });
 
     executeCallback(promise, callback);
@@ -1861,41 +1857,28 @@ function getItem$2(key, callback) {
 function getAllItems$2(callback) {
     var self = this;
 
-    /*var promise = new Promise(function(resolve, reject) {
-        self
-            .ready()
-            .then(function() {
-                resolve([]);
-                var dbInfo = self._dbInfo;
-                dbInfo.db.transaction(function(t) {
-                    tryExecuteSql(
-                        t,
-                        dbInfo,
-                        `SELECT * FROM ${
-                            dbInfo.storeName
-                        }`,
-                        [],
-                        function(t, results) {
-                            var items = [];
-                            for (var i = 0; i < results.rows.length; i++) {
-                                var item = results.rows.item(i).value;
-                                 if (item) {
-                                    item = dbInfo.serializer.deserialize(item);
-                                    items.push(item);
-                                }
-                            }
-                             resolve(items);
-                        },
-                        function(t, error) {
-                            reject(error);
+    var promise = new Promise$1(function (resolve, reject) {
+        self.ready().then(function () {
+            resolve([]);
+            var dbInfo = self._dbInfo;
+            dbInfo.db.transaction(function (t) {
+                tryExecuteSql(t, dbInfo, 'SELECT * FROM ' + dbInfo.storeName, [], function (t, results) {
+                    var items = [];
+                    for (var i = 0; i < results.rows.length; i++) {
+                        var item = results.rows.item(i).value;
+
+                        if (item) {
+                            item = dbInfo.serializer.deserialize(item);
+                            items.push(item);
                         }
-                    );
+                    }
+
+                    resolve(items);
+                }, function (t, error) {
+                    reject(error);
                 });
-            })
-            .catch(reject);
-    });*/
-    var promise = self.ready().then(function () {
-        return Promise$1.resolve([]);
+            });
+        })["catch"](reject);
     });
 
     executeCallback(promise, callback);
