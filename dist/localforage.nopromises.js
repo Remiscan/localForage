@@ -810,6 +810,66 @@ function setItem(key, value, callback) {
     return promise;
 }
 
+function setItems(entries, callback) {
+    var self = this;
+
+    var promise = new Promise$1(function (resolve, reject) {
+        self.ready().then(function () {
+            createTransaction(self._dbInfo, READ_WRITE, function (err, transaction) {
+                if (err) {
+                    return reject(err);
+                }
+
+                try {
+                    var store = transaction.objectStore(self._dbInfo.storeName);
+
+                    var results = [];
+
+                    transaction.oncomplete = function () {
+                        resolve(results);
+                    };
+                    transaction.onabort = transaction.onerror = function () {
+                        var err = transaction.error;
+                        reject(err);
+                    };
+
+                    try {
+                        for (var _iterator = entries, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                            var _ref;
+
+                            if (_isArray) {
+                                if (_i >= _iterator.length) break;
+                                _ref = _iterator[_i++];
+                            } else {
+                                _i = _iterator.next();
+                                if (_i.done) break;
+                                _ref = _i.value;
+                            }
+
+                            var _ref2 = _ref,
+                                _key = _ref2[0],
+                                value = _ref2[1];
+
+                            var normalizedKey = normalizeKey(_key);
+                            var normalizedValue = value === null ? undefined : value;
+                            store.put(normalizedValue, normalizedKey);
+                            results.push([_key, value]);
+                        }
+                    } catch (e) {
+                        transaction.abort();
+                        reject(e);
+                    }
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        })["catch"](reject);
+    });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
 function removeItem(key, callback) {
     var self = this;
 
@@ -1167,6 +1227,7 @@ var asyncStorage = {
     getItem: getItem,
     getAllItems: getAllItems,
     setItem: setItem,
+    setItems: setItems,
     removeItem: removeItem,
     clear: clear,
     length: length,
@@ -1696,6 +1757,21 @@ function setItem$1(key, value, callback) {
     return promise;
 }
 
+function setItems$1(entries, callback) {
+    var self = this;
+
+    var promise = self.ready().then(function () {
+        var _this = this;
+
+        return Promise$1.all(entries.map(function (entry) {
+            return _this.setItem(entry[0], entry[1]);
+        }));
+    });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
 function dropInstance$1(options, callback) {
     callback = getCallback.apply(this, arguments);
 
@@ -1740,6 +1816,7 @@ var localStorageWrapper = {
     getItem: getItem$1,
     getAllItems: getAllItems$1,
     setItem: setItem$1,
+    setItems: setItems$1,
     removeItem: removeItem$1,
     clear: clear$1,
     length: length$1,
@@ -1988,6 +2065,21 @@ function setItem$2(key, value, callback) {
     return _setItem.apply(this, [key, value, callback, 1]);
 }
 
+function setItems$2(entries, callback) {
+    var self = this;
+
+    var promise = self.ready().then(function () {
+        var _this2 = this;
+
+        return Promise$1.all(entries.map(function (entry) {
+            return _this2.setItem(entry[0], entry[1]);
+        }));
+    });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
 function removeItem$2(key, callback) {
     var self = this;
 
@@ -2210,6 +2302,7 @@ var webSQLStorage = {
     getItem: getItem$2,
     getAllItems: getAllItems$2,
     setItem: setItem$2,
+    setItems: setItems$2,
     removeItem: removeItem$2,
     clear: clear$2,
     length: length$2,
@@ -2255,7 +2348,7 @@ var DefaultDriverOrder = [DefaultDrivers.INDEXEDDB._driver, DefaultDrivers.WEBSQ
 
 var OptionalDriverMethods = ['dropInstance'];
 
-var LibraryMethods = ['clear', 'getItem', 'getAllItems', 'iterate', 'key', 'keys', 'length', 'removeItem', 'setItem'].concat(OptionalDriverMethods);
+var LibraryMethods = ['clear', 'getItem', 'getAllItems', 'iterate', 'key', 'keys', 'length', 'removeItem', 'setItem', 'setItems'].concat(OptionalDriverMethods);
 
 var DefaultConfig = {
     description: '',
@@ -2282,12 +2375,12 @@ function extend() {
         var arg = arguments[i];
 
         if (arg) {
-            for (var _key in arg) {
-                if (arg.hasOwnProperty(_key)) {
-                    if (isArray(arg[_key])) {
-                        arguments[0][_key] = arg[_key].slice();
+            for (var _key2 in arg) {
+                if (arg.hasOwnProperty(_key2)) {
+                    if (isArray(arg[_key2])) {
+                        arguments[0][_key2] = arg[_key2].slice();
                     } else {
-                        arguments[0][_key] = arg[_key];
+                        arguments[0][_key2] = arg[_key2];
                     }
                 }
             }
@@ -2410,8 +2503,8 @@ var LocalForage = function () {
                         };
                     };
 
-                    for (var _i = 0, _len = OptionalDriverMethods.length; _i < _len; _i++) {
-                        var optionalDriverMethod = OptionalDriverMethods[_i];
+                    for (var _i2 = 0, _len = OptionalDriverMethods.length; _i2 < _len; _i2++) {
+                        var optionalDriverMethod = OptionalDriverMethods[_i2];
                         if (!driverObject[optionalDriverMethod]) {
                             driverObject[optionalDriverMethod] = methodNotImplementedFactory(optionalDriverMethod);
                         }

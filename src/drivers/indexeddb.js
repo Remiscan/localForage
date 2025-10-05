@@ -764,6 +764,60 @@ function setItem(key, value, callback) {
     return promise;
 }
 
+function setItems(entries, callback) {
+    const self = this;
+
+    var promise = new Promise(function(resolve, reject) {
+        self
+            .ready()
+            .then(function() {
+                createTransaction(self._dbInfo, READ_WRITE, function(
+                    err,
+                    transaction
+                ) {
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    try {
+                        var store = transaction.objectStore(
+                            self._dbInfo.storeName
+                        );
+
+                        var results = [];
+
+                        transaction.oncomplete = function() {
+                            resolve(results);
+                        };
+                        transaction.onabort = transaction.onerror = function() {
+                            var err = transaction.error;
+                            reject(err);
+                        };
+
+                        try {
+                            for (const [key, value] of entries) {
+                                const normalizedKey = normalizeKey(key);
+                                const normalizedValue =
+                                    value === null ? undefined : value;
+                                store.put(normalizedValue, normalizedKey);
+                                results.push([key, value]);
+                            }
+                        } catch (e) {
+                            transaction.abort();
+                            reject(e);
+                        }
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+            })
+            .catch(reject);
+    });
+
+    executeCallback(promise, callback);
+    return promise;
+}
+
 function removeItem(key, callback) {
     var self = this;
 
@@ -1180,6 +1234,7 @@ var asyncStorage = {
     getItem: getItem,
     getAllItems: getAllItems,
     setItem: setItem,
+    setItems: setItems,
     removeItem: removeItem,
     clear: clear,
     length: length,

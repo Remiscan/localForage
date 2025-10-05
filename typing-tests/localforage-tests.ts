@@ -128,6 +128,15 @@ namespace LocalForageTest {
         let newStr: string = str;
     });
 
+    localForage.setItems([["key", "value"]],(err: any, entries: [string, string][]) => {
+        let newError: any = err;
+        let newStr: string = entries.map(e => e.join(':')).join(', ');
+    });
+
+    localForage.setItems([["key", "value"]],(entries: [string, string][]) => {
+        let newStr: string = entries.map(e => e.join(':')).join(', ');
+    });
+
     localForage.removeItem("key",(err: any) => {
         let newError: any = err;
     });
@@ -141,6 +150,7 @@ namespace LocalForageTest {
         getItem: <T>(key: string, callback?: (err: any, value: T) => void) => Promise.resolve({} as T),
         getAllItems: <T>(callback?: (err: any, values: T[]) => void) => Promise.resolve([] as T[]),
         setItem: <T>(key: string, value: T, callback?: (err: any, value: T) => void) => Promise.resolve(value),
+        setItems: <T>(entries: [string, T][], callback?: (err: any, values: [string, T][]) => void) => Promise.resolve(true),
         removeItem: (key: string, callback?: (err: any) => void) => Promise.resolve(),
         clear: (callback?: (err: any) => void) => Promise.resolve(),
         length: (callback?: (err: any, numberOfKeys: number) => void) => Promise.resolve(5),
@@ -157,6 +167,7 @@ namespace LocalForageTest {
         getItem: <T>(key: string, callback?: (err: any, value: T) => void) => Promise.resolve({} as T),
         getAllItems: <T>(callback?: (err: any, values: T[]) => void) => Promise.resolve([] as T[]),
         setItem: <T>(key: string, value: T, callback?: (err: any, value: T) => void) => Promise.resolve(value),
+        setItems: <T>(entries: [string, T][], callback?: (err: any, values: [string, T][]) => void) => Promise.resolve(true),
         removeItem: (key: string, callback?: (err: any) => void) => Promise.resolve(),
         clear: (callback?: (err: any) => void) => Promise.resolve(),
         length: (callback?: (err: any, numberOfKeys: number) => void) => Promise.resolve(5),
@@ -173,6 +184,7 @@ namespace LocalForageTest {
         getItem: <T>(key: string, callback?: (err: any, value: T) => void) => Promise.resolve({} as T),
         getAllItems: <T>(callback?: (err: any, values: T[]) => void) => Promise.resolve([] as T[]),
         setItem: <T>(key: string, value: T, callback?: (err: any, value: T) => void) => Promise.resolve(value),
+        setItems: <T>(entries: [string, T][], callback?: (err: any, values: [string, T][]) => void) => Promise.resolve(true),
         removeItem: (key: string, callback?: (err: any) => void) => Promise.resolve(),
         clear: (callback?: (err: any) => void) => Promise.resolve(),
         length: (callback?: (err: any, numberOfKeys: number) => void) => Promise.resolve(5),

@@ -21,6 +21,8 @@ interface LocalForageDbMethodsCore {
 
     setItem<T>(key: string, value: T, callback?: (err: any, value: T) => void): Promise<T>;
 
+    setItems<T>(entries: [string, T][], callback?: (err: any, entries: [string, T][]) => void): Promise<boolean>;
+
     removeItem(key: string, callback?: (err: any) => void): Promise<void>;
 
     clear(callback?: (err: any) => void): Promise<void>;

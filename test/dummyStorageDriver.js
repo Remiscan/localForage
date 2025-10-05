@@ -305,6 +305,21 @@
         return promise;
     }
 
+    function setItems(entries, callback) {
+        var self = this;
+
+        var promise = self.ready().then(function() {
+            return Promise.all(
+                entries.map(entry => {
+                    return this.setItem(entry[0], entry[1]);
+                })
+            );
+        });
+
+        executeCallback(promise, callback);
+        return promise;
+    }
+
     // _serialize just like in LocalStorage
     function _serialize(value, callback) {
         var valueString = '';
@@ -479,6 +494,7 @@
         getItem: getItem,
         getAllItems: getAllItems,
         setItem: setItem,
+        setItems: setItems,
         removeItem: removeItem,
         clear: clear,
         length: length,

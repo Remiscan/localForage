@@ -13,6 +13,7 @@ var driverApiMethods = [
     'getItem',
     'getAllItems',
     'setItem',
+    'setItems',
     'clear',
     'length',
     'removeItem',
@@ -142,6 +143,7 @@ describe('localForage', function() {
                 getItem: driverDummyMethod,
                 getAllItems: driverDummyMethod,
                 setItem: driverDummyMethod,
+                setItems: driverDummyMethod,
                 removeItem: driverDummyMethod,
                 clear: driverDummyMethod,
                 length: driverDummyMethod,
@@ -246,6 +248,7 @@ SUPPORTED_DRIVERS.forEach(function(driverName) {
             expect(localforage.getItem).to.be.a('function');
             expect(localforage.getAllItems).to.be.a('function');
             expect(localforage.setItem).to.be.a('function');
+            expect(localforage.setItems).to.be.a('function');
             expect(localforage.clear).to.be.a('function');
             expect(localforage.length).to.be.a('function');
             expect(localforage.removeItem).to.be.a('function');
@@ -439,6 +442,35 @@ SUPPORTED_DRIVERS.forEach(function(driverName) {
                                     'value1b',
                                     'value2b',
                                     'value3b'
+                                ]);
+                                done();
+                            },
+                            function(error) {
+                                done(error || 'error');
+                            }
+                        );
+                });
+
+                it('stores and retrieves more than one items from the storage in a single transaction', function(done) {
+                    localforage
+                        .setItems([
+                            ['key1', 'value1bb'],
+                            ['key2', 'value2bb'],
+                            ['key3', 'value3bb']
+                        ])
+                        .then(function() {
+                            return Promise.all([
+                                localforage.getItem('key1'),
+                                localforage.getItem('key2'),
+                                localforage.getItem('key3')
+                            ]);
+                        })
+                        .then(
+                            function(values) {
+                                expect(values).to.eql([
+                                    'value1bb',
+                                    'value2bb',
+                                    'value3bb'
                                 ]);
                                 done();
                             },
